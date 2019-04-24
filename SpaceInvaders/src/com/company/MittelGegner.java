@@ -15,6 +15,7 @@ public class MittelGegner extends Gegner {
         width = 25;
         height = 35;
         color = Color.magenta;
+        punkte = 100;
     }
 
     public void paintComponent(Graphics g) {

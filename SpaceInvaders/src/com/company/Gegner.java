@@ -13,6 +13,7 @@ abstract class Gegner extends Graphics {
     int height;
     int projektilgeschw;
     Color color;
+    int punkte;
 
     public Gegner() {
 

@@ -57,30 +57,67 @@ public class Spielfeld extends JPanel implements KeyListener {
     JLabel laserGeschoss;
     JLabel lahmesGeschoss;
     JLabel portalGeschoss;
+    JLabel punkte;
 
+
+    int punktestand=0;
     public void scoreBoard() {
+        JPanel t = new JPanel();
+        t.setLayout(new GridBagLayout());
+        t.setBackground(Color.blue);
+        t.setBorder(BorderFactory.createLineBorder(Color.red));
+        GridBagConstraints c = new GridBagConstraints();
+        this.add(t);
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
         standardGeschoss = new JLabel("Standard: " + getGeschossCount(0));
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        t.add(standardGeschoss,c);
         explosivGeschoss = new JLabel("Explosiv: " + getGeschossCount(1));
+        c.gridx = 1;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        t.add(explosivGeschoss,c);
         laserGeschoss = new JLabel("Laser: " + getGeschossCount(2));
+        c.gridx = 2;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        t.add(laserGeschoss,c);
         lahmesGeschoss = new JLabel("Lahmes: " + getGeschossCount(3));
+        c.gridx = 3;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        t.add(lahmesGeschoss,c);
         portalGeschoss = new JLabel("Portal: " + getGeschossCount(4));
+        c.gridx = 4;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        t.add(portalGeschoss,c);
+        punkte = new JLabel("Punkte: " + punktestand);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 5;
+        t.add(punkte,c);
         standardGeschoss.setForeground(Color.green);
         explosivGeschoss.setForeground(Color.black);
         laserGeschoss.setForeground(Color.black);
         lahmesGeschoss.setForeground(Color.black);
         portalGeschoss.setForeground(Color.black);
-        this.add(standardGeschoss);
-        this.add(explosivGeschoss);
-        this.add(laserGeschoss);
-        this.add(lahmesGeschoss);
-        this.add(portalGeschoss);
+
     }
+
+
+
     public void refreshBoard() {
         standardGeschoss.setText("Standard: " + getGeschossCount(0));
         explosivGeschoss.setText("Explosiv: " + getGeschossCount(1));
         laserGeschoss.setText("Laser: " + getGeschossCount(2));
         lahmesGeschoss.setText("Lahmes: " + getGeschossCount(3));
         portalGeschoss.setText("Portal: " + getGeschossCount(4));
+        punkte.setText("Punkte: " + punktestand);
         repaint();
     }
 
@@ -89,24 +126,30 @@ public class Spielfeld extends JPanel implements KeyListener {
     static LahmesGeschoss lahmesGeschossItem = new LahmesGeschoss();
     static LaserGeschoss laserGeschossItem = new LaserGeschoss();
     static PortalGeschoss portalGeschossItem = new PortalGeschoss();
-
+    static Random rnd1 = new Random();
 
     public void checkGegner(int i) {
         System.out.println(gegnerArrayList.get(i).getClass().toString());
         if(gegnerArrayList.get(i) instanceof MinionGegner) {
             System.out.println("test");
-            for(int j = 0; j < 10; j++) {
+            for(int j = 0; j < 5; j++) {
                 items.item.add(standardGeschossItem);
             }
-            for(int j = 0; j<5; j++) {
+            for (int j=0; j<rnd1.nextInt(10)+1; j++) {
+                if(j == 5) {
+                    items.item.add(portalGeschossItem);
+                }
+            }
+            for(int j = 0; j<1; j++) {
                 items.item.add(explosivGeschossItem);
+
             }
         } else if (gegnerArrayList.get(i) instanceof MittelGegner) {
             System.out.println("test2");
            for(int j = 0; j<10; j++) {
                items.item.add(lahmesGeschossItem);
            }
-            for(int j = 0; j < 20; j++) {
+            for(int j = 0; j < 10; j++) {
                 items.item.add(standardGeschossItem);
             }
             for(int j = 0; j<10; j++) {
@@ -115,13 +158,13 @@ public class Spielfeld extends JPanel implements KeyListener {
         } else if(gegnerArrayList.get(i) instanceof BossGegner) {
             System.out.println("test3");
             items.item.add(laserGeschossItem);
-            for(int j=0; j<100; j++) {
+            for(int j=0; j<20; j++) {
                 items.item.add(standardGeschossItem);
             }
-            for (int j=0; j<20; j++) {
+            for (int j=0; j<5; j++) {
                 items.item.add(explosivGeschossItem);
             }
-            for (int j=0; j<15; j++){
+            for (int j=0; j<5; j++){
                 items.item.add(lahmesGeschossItem);
             }
         } else if(gegnerArrayList.get(i) instanceof SpiegelGegner) {
@@ -130,10 +173,11 @@ public class Spielfeld extends JPanel implements KeyListener {
             items.item.add(explosivGeschossItem);
             items.item.add(explosivGeschossItem);
 
-            for(int j=0; j<50; j++) {
+            for(int j=0; j<10; j++) {
                 items.item.add(standardGeschossItem);
             }
         }
+        punktestand += gegnerArrayList.get(i).punkte;
         refreshBoard();
     }
 
@@ -178,19 +222,19 @@ public class Spielfeld extends JPanel implements KeyListener {
                 fixLag();
                 Random rnd = new Random();
                 int rndG = rnd.nextInt(50) + 1;
-                if (rndG >= 1 && rndG <= 30) {
-                    gegnerArrayList.add(new MinionGegner());
-                    newCounter++;
-                } else if (rndG == 32 || rndG == 31) {
-                    gegnerArrayList.add(new MittelGegner());
-                    newCounter++;
-                } else if (rndG == 40) {
-                    gegnerArrayList.add(new BossGegner());
-                    newCounter++;
-                } else if(rndG == 35 || rndG == 36 || rndG == 37){
-                    gegnerArrayList.add(new SpiegelGegner());
-                    newCounter++;
-                }
+                    if (rndG >= 1 && rndG <= 30) {
+                        gegnerArrayList.add(new MinionGegner());
+                        newCounter++;
+                    } else if (rndG == 32 || rndG == 31) {
+                        gegnerArrayList.add(new MittelGegner());
+                        newCounter++;
+                    } else if (rndG == 40) {
+                        gegnerArrayList.add(new BossGegner());
+                        newCounter++;
+                    } else if (rndG == 35 || rndG == 36 || rndG == 37) {
+                        gegnerArrayList.add(new SpiegelGegner());
+                        newCounter++;
+                    }
                 if (!gegnerArrayList.isEmpty()) {
                     gegnerArrayList.get(newCounter).x = Spielfeld.super.getWidth();
                     gegnerArrayList.get(newCounter).y = rnd.nextInt(Spielfeld.super.getHeight()-200)+50;
@@ -316,7 +360,6 @@ public class Spielfeld extends JPanel implements KeyListener {
         }
         repaint();
     }
-
     public void casers() {
         switch (cases) {
             case 1:
@@ -405,6 +448,7 @@ public class Spielfeld extends JPanel implements KeyListener {
         counterCount = 0;
 
         if (activateLaser) {
+
             t.add(new Timer(10, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -433,9 +477,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                                 gegnerArrayList.remove(gegnerArrayList.get(gegnerArrayList.indexOf(gegnerArrayList.get(i))));
                                 newCounter--;
                             }
-
                         }
-
                     }
                     repaint();
                     counterCount++;
@@ -446,11 +488,7 @@ public class Spielfeld extends JPanel implements KeyListener {
             t.get(count).start();
             getT = count;
         }
-
-
     }
-
-
     public void fixLag() {
         PointerInfo pi = MouseInfo.getPointerInfo();
         Point p = pi.getLocation();

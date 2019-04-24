@@ -8,12 +8,13 @@ public class MinionGegner extends Gegner{
 
 
     public MinionGegner(){
-        leben = 50;
+        leben = 100;
         schaden = 10;
         bewegung = 15;
         width = 20;
         height = 20;
         color = Color.black;
+        punkte = 50;
 
 
 

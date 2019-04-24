@@ -11,11 +11,12 @@ public class SpiegelGegner extends Gegner {
     public SpiegelGegner(){
 
         schaden = 30;
-        leben = 60;
+        leben = 120;
         bewegung = 20;
         width = 100;
         height = 200;
         color = Color.magenta;
+        punkte = 10;
 
         }
 

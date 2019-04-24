@@ -13,6 +13,7 @@ public class BossGegner extends Gegner{
         width = 150;
         height = 150;
         color = Color.red;
+        punkte = 1000;
     }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
