@@ -144,18 +144,26 @@ public class Spielfeld extends JPanel implements KeyListener {
 
             }
         } else if (gegnerArrayList.get(i) instanceof MittelGegner) {
-           for(int j = 0; j<10; j++) {
-               items.item.add(lahmesGeschossItem);
+           for(int j = 0; j<rnd1.nextInt(5)+1;  j++) {
+               if(j == 7){
+                    items.item.add(lahmesGeschossItem);
+                    items.item.add(lahmesGeschossItem);
+                    items.item.add(lahmesGeschossItem);
+               }
            }
             for(int j = 0; j < 10; j++) {
                 items.item.add(standardGeschossItem);
             }
-            for(int j = 0; j<10; j++) {
+            for(int j = 0; j<3; j++) {
                 items.item.add(explosivGeschossItem);
             }
         } else if(gegnerArrayList.get(i) instanceof BossGegner) {
-            items.item.add(laserGeschossItem);
-            for(int j=0; j<20; j++) {
+            for(int j=0; j<rnd1.nextInt(2)+1; j++) {
+                if(j==1){
+                    items.item.add(laserGeschossItem);
+                }
+            }
+            for(int j=0; j<50; j++) {
                 items.item.add(standardGeschossItem);
             }
             for (int j=0; j<5; j++) {
