@@ -76,47 +76,47 @@ public class Spielfeld extends JPanel implements KeyListener {
         c.gridy = 0;
         c.gridwidth = 1;
         t.add(standardGeschoss,c);
-        explosivGeschoss = new JLabel("Explosiv: " + getGeschossCount(1));
+        explosivGeschoss = new JLabel( " Explosiv: " + getGeschossCount(1));
         c.gridx = 1;
         c.gridy = 0;
         c.gridwidth = 1;
         t.add(explosivGeschoss,c);
-        laserGeschoss = new JLabel("Laser: " + getGeschossCount(2));
+        laserGeschoss = new JLabel(" Laser: " + getGeschossCount(2));
         c.gridx = 2;
         c.gridy = 0;
         c.gridwidth = 1;
         t.add(laserGeschoss,c);
-        lahmesGeschoss = new JLabel("Lahmes: " + getGeschossCount(3));
+        lahmesGeschoss = new JLabel(" Lahmes: " + getGeschossCount(3));
         c.gridx = 3;
         c.gridy = 0;
         c.gridwidth = 1;
         t.add(lahmesGeschoss,c);
-        portalGeschoss = new JLabel("Portal: " + getGeschossCount(4));
+        portalGeschoss = new JLabel(" Portal: " + getGeschossCount(4));
         c.gridx = 4;
         c.gridy = 0;
         c.gridwidth = 1;
         t.add(portalGeschoss,c);
         punkte = new JLabel("Punkte: " + punktestand);
-        c.gridx = 0;
+        c.gridx = 2;
         c.gridy = 1;
-        c.gridwidth = 5;
+        c.gridwidth = 1;
         t.add(punkte,c);
         standardGeschoss.setForeground(Color.green);
         explosivGeschoss.setForeground(Color.black);
         laserGeschoss.setForeground(Color.black);
         lahmesGeschoss.setForeground(Color.black);
         portalGeschoss.setForeground(Color.black);
-
+        punkte.setForeground(Color.yellow);
     }
 
 
 
     public void refreshBoard() {
         standardGeschoss.setText("Standard: " + getGeschossCount(0));
-        explosivGeschoss.setText("Explosiv: " + getGeschossCount(1));
-        laserGeschoss.setText("Laser: " + getGeschossCount(2));
-        lahmesGeschoss.setText("Lahmes: " + getGeschossCount(3));
-        portalGeschoss.setText("Portal: " + getGeschossCount(4));
+        explosivGeschoss.setText(" Explosiv: " + getGeschossCount(1));
+        laserGeschoss.setText(" Laser: " + getGeschossCount(2));
+        lahmesGeschoss.setText(" Lahmes: " + getGeschossCount(3));
+        portalGeschoss.setText(" Portal: " + getGeschossCount(4));
         punkte.setText("Punkte: " + punktestand);
         repaint();
     }
@@ -292,6 +292,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     if (items.item.contains(standardGeschossItem)) {
                         items.item.remove(items.item.get(items.item.indexOf(standardGeschossItem)));
                         geschossArrayList.add(new StandardGeschoss());
+                        isOk = true;
                     } else {
                         isOk = false;
                     }
@@ -300,6 +301,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     if (items.item.contains(explosivGeschossItem)) {
                         items.item.remove(items.item.get(items.item.indexOf(explosivGeschossItem)));
                         geschossArrayList.add(new ExplosivGeschoss());
+                        isOk = true;
                     } else {
                         isOk = false;
                     }
@@ -309,6 +311,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                         if (items.item.contains(laserGeschossItem)) {
                             items.item.remove(items.item.get(items.item.indexOf(laserGeschossItem)));
                             geschossArrayList.add(new LaserGeschoss());
+                            isOk = true;
                         } else {
                             isOk = false;
                         }
@@ -318,6 +321,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     if (items.item.contains(lahmesGeschossItem)) {
                         items.item.remove(items.item.get(items.item.indexOf(lahmesGeschossItem)));
                         geschossArrayList.add(new LahmesGeschoss());
+                        isOk = true;
                     } else {
                         isOk = false;
                     }
@@ -326,6 +330,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     if (items.item.contains(portalGeschossItem)) {
                         items.item.remove(items.item.get(items.item.indexOf(portalGeschossItem)));
                         geschossArrayList.add(new PortalGeschoss());
+                        isOk = true;
                     } else {
                         isOk = false;
                     }
@@ -334,12 +339,12 @@ public class Spielfeld extends JPanel implements KeyListener {
             if (!items.item.isEmpty() && isOk) {
                 if (cases == 1 && geschossArrayList.get(geschossCounter) instanceof StandardGeschoss) {
 
-                    doAnything(geschossArrayList.get(geschossCounter));
+                    doStandard(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 2 && geschossArrayList.get(geschossCounter) instanceof ExplosivGeschoss) {
 
-                    doAnything(geschossArrayList.get(geschossCounter));
+                    doExplosion(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 3 && activateLaser && geschossArrayList.get(geschossCounter) instanceof LaserGeschoss) {
@@ -349,17 +354,39 @@ public class Spielfeld extends JPanel implements KeyListener {
 
                 } else if (cases == 4 && geschossArrayList.get(geschossCounter) instanceof LahmesGeschoss) {
 
-                    doAnything(geschossArrayList.get(geschossCounter));
+                    doLahmes(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 5 && geschossArrayList.get(geschossCounter) instanceof PortalGeschoss) {
-                    doAnything(geschossArrayList.get(geschossCounter));
+                    doPortal(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
                 }
             }
         }
         repaint();
     }
+
+    void doStandard(Geschoss sg) {
+        sg.y = s.y + (s.height / 2 + 19);
+        sg.x = s.width;
+        doAnything(sg);
+    }
+    void doExplosion(Geschoss sg) {
+        sg.y = s.y + (s.height / 2 + 11);
+        sg.x = s.width;
+        doAnything(sg);
+    }
+    void doLahmes(Geschoss sg) {
+        sg.y = s.y + (s.height / 2);
+        sg.x = s.width;
+        doAnything(sg);
+    }
+    void doPortal(Geschoss sg) {
+        sg.y = s.y + (s.height / 2 - 25);
+        sg.x = s.width;
+        doAnything(sg);
+    }
+
     public void casers() {
         switch (cases) {
             case 1:
@@ -395,7 +422,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                 explosivGeschoss.setForeground(Color.black);
                 laserGeschoss.setForeground(Color.black);
                 lahmesGeschoss.setForeground(Color.black);
-                portalGeschoss.setForeground(Color.green                                                    );
+                portalGeschoss.setForeground(Color.green);
                 break;
         }
         repaint();
@@ -406,9 +433,9 @@ public class Spielfeld extends JPanel implements KeyListener {
 
     }
 
+
+
     public void doAnything(Geschoss sg) {
-        sg.y = s.y + s.height / 2;
-        sg.x = s.width;
 
         t.add(new Timer(125, new ActionListener() {
             @Override
@@ -443,7 +470,7 @@ public class Spielfeld extends JPanel implements KeyListener {
     public void doLaser(LaserGeschoss lg) {
         durch = false;
         anotherCount = 0;
-        lg.y = s.y + s.height / 2;
+        lg.y = s.y + (s.height / 2 + 19);
         lg.x = s.width;
         counterCount = 0;
 
@@ -455,7 +482,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     fixLag();
                     activateLaser = false;
                     lg.width += 10;
-                    lg.y = s.y + s.height / 2;
+                    lg.y = s.y + (s.height / 2 + 19);
                     int max = (Spielfeld.super.getWidth() / 10) + 10;
                     if (counterCount >= max && !durch) {
                         durch = true;
