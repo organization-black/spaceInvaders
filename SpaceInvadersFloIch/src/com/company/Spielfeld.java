@@ -482,6 +482,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     fixLag();
                     activateLaser = false;
                     lg.width += 10;
+                    lg.y = s.y + (s.height / 2 + 19);
                     int max = (Spielfeld.super.getWidth() / 10) + 10;
                     if (counterCount >= max && !durch) {
                         durch = true;
