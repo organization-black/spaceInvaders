@@ -131,7 +131,6 @@ public class Spielfeld extends JPanel implements KeyListener {
     public void checkGegner(int i) {
         System.out.println(gegnerArrayList.get(i).getClass().toString());
         if(gegnerArrayList.get(i) instanceof MinionGegner) {
-            System.out.println("test");
             for(int j = 0; j < 5; j++) {
                 items.item.add(standardGeschossItem);
             }
@@ -145,28 +144,18 @@ public class Spielfeld extends JPanel implements KeyListener {
 
             }
         } else if (gegnerArrayList.get(i) instanceof MittelGegner) {
-            System.out.println("test2");
-           for(int j = 0; j<rnd1.nextInt(5)+1;  j++) {
-               if(j == 7){
+           for(int j = 0; j<10; j++) {
                items.item.add(lahmesGeschossItem);
-               items.item.add(lahmesGeschossItem);
-               items.item.add(lahmesGeschossItem);
-               }
            }
             for(int j = 0; j < 10; j++) {
                 items.item.add(standardGeschossItem);
             }
-            for(int j = 0; j<3; j++) {
+            for(int j = 0; j<10; j++) {
                 items.item.add(explosivGeschossItem);
             }
         } else if(gegnerArrayList.get(i) instanceof BossGegner) {
-            System.out.println("test3");
-            for(int j=0; j<rnd1.nextInt(2)+1; j++) {
-                if(j==1){
-                    items.item.add(laserGeschossItem);
-                }
-            }
-            for(int j=0; j<50; j++) {
+            items.item.add(laserGeschossItem);
+            for(int j=0; j<20; j++) {
                 items.item.add(standardGeschossItem);
             }
             for (int j=0; j<5; j++) {
@@ -176,7 +165,6 @@ public class Spielfeld extends JPanel implements KeyListener {
                 items.item.add(lahmesGeschossItem);
             }
         } else if(gegnerArrayList.get(i) instanceof SpiegelGegner) {
-            System.out.println("test4");
             items.item.add(explosivGeschossItem);
             items.item.add(explosivGeschossItem);
             items.item.add(explosivGeschossItem);
@@ -441,18 +429,20 @@ public class Spielfeld extends JPanel implements KeyListener {
 
     }
 
-
+    Timer timer;
 
     public void doAnything(Geschoss sg) {
 
-        t.add(new Timer(125, new ActionListener() {
+
+        count++;
+        int savenumber = count;
+        timer = new Timer(125, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 fixLag();
                 for (int i = 0; i < newCounter; i++) {
                     if (sg.x < gegnerArrayList.get(i).x + gegnerArrayList.get(i).width && sg.x + sg.width > gegnerArrayList.get(i).x && sg.y < gegnerArrayList.get(i).y + gegnerArrayList.get(i).height && sg.y + sg.height > gegnerArrayList.get(i).y) {
                         gegnerArrayList.get(i).leben = gegnerArrayList.get(i).leben - sg.dmg;
-                        //System.out.println(gegnerArrayList.get(i).leben - sg.dmg);
                         sg.dmg = 0;
                         if(geschossArrayList.contains(sg)) {
                             geschossArrayList.remove(sg);
@@ -463,14 +453,22 @@ public class Spielfeld extends JPanel implements KeyListener {
                                 newCounter--;
                             }
                         }
+                        stopTimer(t.get(savenumber));
                     }
+                }
+                if(sg.x >= Spielfeld.super.getWidth()) {
+                    if(geschossArrayList.contains(sg)) {
+                        geschossArrayList.remove(sg);
+                        geschossCounter--;
+                    }
+                    stopTimer(t.get(savenumber));
                 }
                 sg.x += 10;
                 repaint();
 
             }
-        }));
-        count++;
+        });
+        t.add(timer);
         t.get(count).start();
     }
 
@@ -506,7 +504,6 @@ public class Spielfeld extends JPanel implements KeyListener {
 
                         if(lg.x < gegnerArrayList.get(i).x + gegnerArrayList.get(i).width && lg.x + lg.width > gegnerArrayList.get(i).x && lg.y < gegnerArrayList.get(i).y + gegnerArrayList.get(i).height && lg.y + lg.height > gegnerArrayList.get(i).y) {
                             gegnerArrayList.get(i).leben = gegnerArrayList.get(i).leben - lg.dmg;
-                            //System.out.println(gegnerArrayList.get(i).leben - lg.dmg);
                             if (gegnerArrayList.get(i).leben <= 0) {
                                 checkGegner(i);
                                 gegnerArrayList.remove(gegnerArrayList.get(gegnerArrayList.indexOf(gegnerArrayList.get(i))));
