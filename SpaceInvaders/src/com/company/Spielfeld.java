@@ -294,7 +294,6 @@ public class Spielfeld extends JPanel implements KeyListener {
             switch (cases) {
                 case 1:
                     if (items.item.contains(standardGeschossItem)) {
-                        items.item.remove(items.item.get(items.item.indexOf(standardGeschossItem)));
                         geschossArrayList.add(new StandardGeschoss());
                         isOk = true;
                     } else {
@@ -303,7 +302,6 @@ public class Spielfeld extends JPanel implements KeyListener {
                     break;
                 case 2:
                     if (items.item.contains(explosivGeschossItem)) {
-                        items.item.remove(items.item.get(items.item.indexOf(explosivGeschossItem)));
                         geschossArrayList.add(new ExplosivGeschoss());
                         isOk = true;
                     } else {
@@ -313,7 +311,6 @@ public class Spielfeld extends JPanel implements KeyListener {
                 case 3:
                     if(activateLaser) {
                         if (items.item.contains(laserGeschossItem)) {
-                            items.item.remove(items.item.get(items.item.indexOf(laserGeschossItem)));
                             geschossArrayList.add(new LaserGeschoss());
                             isOk = true;
                         } else {
@@ -323,7 +320,6 @@ public class Spielfeld extends JPanel implements KeyListener {
                     break;
                 case 4:
                     if (items.item.contains(lahmesGeschossItem)) {
-                        items.item.remove(items.item.get(items.item.indexOf(lahmesGeschossItem)));
                         geschossArrayList.add(new LahmesGeschoss());
                         isOk = true;
                     } else {
@@ -332,7 +328,6 @@ public class Spielfeld extends JPanel implements KeyListener {
                     break;
                 case 5:
                     if (items.item.contains(portalGeschossItem)) {
-                        items.item.remove(items.item.get(items.item.indexOf(portalGeschossItem)));
                         geschossArrayList.add(new PortalGeschoss());
                         isOk = true;
                     } else {
@@ -342,26 +337,27 @@ public class Spielfeld extends JPanel implements KeyListener {
             }
             if (!items.item.isEmpty() && isOk) {
                 if (cases == 1 && geschossArrayList.get(geschossCounter) instanceof StandardGeschoss) {
-
+                    items.item.remove(items.item.get(items.item.indexOf(standardGeschossItem)));
                     doStandard(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 2 && geschossArrayList.get(geschossCounter) instanceof ExplosivGeschoss) {
-
+                    items.item.remove(items.item.get(items.item.indexOf(explosivGeschossItem)));
                     doExplosion(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 3 && activateLaser && geschossArrayList.get(geschossCounter) instanceof LaserGeschoss) {
-
+                    items.item.remove(items.item.get(items.item.indexOf(laserGeschossItem)));
                     doLaser((LaserGeschoss) geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 4 && geschossArrayList.get(geschossCounter) instanceof LahmesGeschoss) {
-
+                    items.item.remove(items.item.get(items.item.indexOf(lahmesGeschossItem)));
                     doLahmes(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
 
                 } else if (cases == 5 && geschossArrayList.get(geschossCounter) instanceof PortalGeschoss) {
+                    items.item.remove(items.item.get(items.item.indexOf(portalGeschossItem)));
                     doPortal(geschossArrayList.get(geschossCounter));
                     geschossCounter++;
                 }
