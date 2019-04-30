@@ -16,6 +16,8 @@ public class MittelGegner extends Gegner {
         height = 35;
         color = Color.magenta;
         punkte = 100;
+        vollesLeben = leben;
+        healthBar = new HealthBar(leben,vollesLeben,x,y,width);
     }
 
     public void paintComponent(Graphics g) {

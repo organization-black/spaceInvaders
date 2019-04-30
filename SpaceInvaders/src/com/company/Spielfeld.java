@@ -1,10 +1,16 @@
 package com.company;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static java.lang.Thread.sleep;
 
 public class Spielfeld extends JPanel implements KeyListener {
 
@@ -23,6 +29,11 @@ public class Spielfeld extends JPanel implements KeyListener {
     boolean einMal;
     Items items;
     int cases;
+    boolean[] downKeys;
+    ArrayList<HealthBar> healthBar;
+    int healthBarCounter;
+    BufferedImage ePicture;
+    boolean ePictureExist;
 
 
     ArrayList<Gegner> gegnerArrayList;
@@ -50,7 +61,144 @@ public class Spielfeld extends JPanel implements KeyListener {
         items = new Items();
         scoreBoard();
         cases = 1;
+        downKeys = new boolean[5];
+        runner.start();
+        runner2.start();
+        healthBar = new ArrayList<>();
+        healthBarCounter = 0;
+        savehealth = 0;
+        ePictureExist = false;
     }
+
+    private Thread runner = new Thread() {
+        {
+            setPriority(MIN_PRIORITY);
+        }
+
+        public void run() {
+
+            while (true) {
+
+                if(downKeys[0]) {
+                    s.y -= 1;
+                }
+                if(downKeys[1]) {
+                    s.y += 1;
+                }
+
+                if (s.y <= -s.height / 4) {
+                    s.y = -s.height / 4;
+                }
+                if (s.y >= Spielfeld.super.getHeight() - s.height) {
+                    s.y = (Spielfeld.super.getHeight() - s.height);
+                }
+                repaint();
+
+                try {
+                    sleep(2L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    };
+
+    private Thread runner2 = new Thread() {
+        {
+            setPriority(MIN_PRIORITY);
+        }
+
+        public void run() {
+
+            while (true) {
+
+                if(downKeys[2]) {
+                    boolean isOk = true;
+                    switch (cases) {
+                        case 1:
+                            if (items.item.contains(standardGeschossItem)) {
+                                geschossArrayList.add(new StandardGeschoss());
+                                isOk = true;
+                            } else {
+                                isOk = false;
+                            }
+                            break;
+                        case 2:
+                            if (items.item.contains(explosivGeschossItem)) {
+                                geschossArrayList.add(new ExplosivGeschoss());
+                                isOk = true;
+                            } else {
+                                isOk = false;
+                            }
+                            break;
+                        case 3:
+                            if(activateLaser) {
+                                if (items.item.contains(laserGeschossItem)) {
+                                    geschossArrayList.add(new LaserGeschoss());
+                                    isOk = true;
+                                } else {
+                                    isOk = false;
+                                }
+                            }
+                            break;
+                        case 4:
+                            if (items.item.contains(lahmesGeschossItem)) {
+                                geschossArrayList.add(new LahmesGeschoss());
+                                isOk = true;
+                            } else {
+                                isOk = false;
+                            }
+                            break;
+                        case 5:
+                            if (items.item.contains(portalGeschossItem)) {
+                                geschossArrayList.add(new PortalGeschoss());
+                                isOk = true;
+                            } else {
+                                isOk = false;
+                            }
+                            break;
+                    }
+                    if (!items.item.isEmpty() && isOk) {
+                        if (cases == 1 && geschossArrayList.get(geschossCounter) instanceof StandardGeschoss) {
+                            items.item.remove(items.item.get(items.item.indexOf(standardGeschossItem)));
+                            doStandard(geschossArrayList.get(geschossCounter));
+                            geschossCounter++;
+
+                        } else if (cases == 2 && geschossArrayList.get(geschossCounter) instanceof ExplosivGeschoss) {
+                            items.item.remove(items.item.get(items.item.indexOf(explosivGeschossItem)));
+                            doExplosion(geschossArrayList.get(geschossCounter));
+                            geschossCounter++;
+
+                        } else if (cases == 3 && activateLaser && geschossArrayList.get(geschossCounter) instanceof LaserGeschoss) {
+                            items.item.remove(items.item.get(items.item.indexOf(laserGeschossItem)));
+                            doLaser((LaserGeschoss) geschossArrayList.get(geschossCounter));
+                            geschossCounter++;
+
+                        } else if (cases == 4 && geschossArrayList.get(geschossCounter) instanceof LahmesGeschoss) {
+                            items.item.remove(items.item.get(items.item.indexOf(lahmesGeschossItem)));
+                            doLahmes(geschossArrayList.get(geschossCounter));
+                            geschossCounter++;
+
+                        } else if (cases == 5 && geschossArrayList.get(geschossCounter) instanceof PortalGeschoss) {
+                            items.item.remove(items.item.get(items.item.indexOf(portalGeschossItem)));
+                            doPortal(geschossArrayList.get(geschossCounter));
+                            geschossCounter++;
+                        }
+                    }
+                }
+
+                repaint();
+
+                try {
+                    sleep(100L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    };
 
     JLabel standardGeschoss;
     JLabel explosivGeschoss;
@@ -215,6 +363,12 @@ public class Spielfeld extends JPanel implements KeyListener {
             h.paintComponent(g);
         }
         s.paintComponent(g);
+        for (HealthBar h : healthBar) {
+            h.paintComponent(g);
+        }
+        if(ePictureExist) {
+            eGeschoss.drawImage(ePicture, eGeschoss.x,eGeschoss.y,eGeschoss.width,eGeschoss.height,null);
+        }
     }
 
     int newCounter = -1;
@@ -260,110 +414,51 @@ public class Spielfeld extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_W) {
-            s.y -= 5;
-        } else if (key == KeyEvent.VK_S) {
-            s.y += 5;
-        }
-        if (s.y <= -s.height / 4) {
-            s.y = -s.height / 4;
-        }
-        if (s.y >= this.getHeight() - s.height) {
-            s.y = (this.getHeight() - s.height);
-        }
-        if(key == KeyEvent.VK_RIGHT) {
-            if(cases<5) {
-                cases++;
-                casers();
-            } else {
-                cases = 1;
-                casers();
-            }
-        }
-        if(key == KeyEvent.VK_LEFT) {
-            if(cases>1) {
-                cases--;
-                casers();
-            } else {
-                cases = 5;
-                casers();
-            }
-        }
-        if (key == KeyEvent.VK_SPACE) {
-            boolean isOk = true;
-            switch (cases) {
-                case 1:
-                    if (items.item.contains(standardGeschossItem)) {
-                        geschossArrayList.add(new StandardGeschoss());
-                        isOk = true;
-                    } else {
-                        isOk = false;
-                    }
-                    break;
-                case 2:
-                    if (items.item.contains(explosivGeschossItem)) {
-                        geschossArrayList.add(new ExplosivGeschoss());
-                        isOk = true;
-                    } else {
-                        isOk = false;
-                    }
-                    break;
-                case 3:
-                    if(activateLaser) {
-                        if (items.item.contains(laserGeschossItem)) {
-                            geschossArrayList.add(new LaserGeschoss());
-                            isOk = true;
-                        } else {
-                            isOk = false;
-                        }
-                    }
-                    break;
-                case 4:
-                    if (items.item.contains(lahmesGeschossItem)) {
-                        geschossArrayList.add(new LahmesGeschoss());
-                        isOk = true;
-                    } else {
-                        isOk = false;
-                    }
-                    break;
-                case 5:
-                    if (items.item.contains(portalGeschossItem)) {
-                        geschossArrayList.add(new PortalGeschoss());
-                        isOk = true;
-                    } else {
-                        isOk = false;
-                    }
-                    break;
-            }
-            if (!items.item.isEmpty() && isOk) {
-                if (cases == 1 && geschossArrayList.get(geschossCounter) instanceof StandardGeschoss) {
-                    items.item.remove(items.item.get(items.item.indexOf(standardGeschossItem)));
-                    doStandard(geschossArrayList.get(geschossCounter));
-                    geschossCounter++;
-
-                } else if (cases == 2 && geschossArrayList.get(geschossCounter) instanceof ExplosivGeschoss) {
-                    items.item.remove(items.item.get(items.item.indexOf(explosivGeschossItem)));
-                    doExplosion(geschossArrayList.get(geschossCounter));
-                    geschossCounter++;
-
-                } else if (cases == 3 && activateLaser && geschossArrayList.get(geschossCounter) instanceof LaserGeschoss) {
-                    items.item.remove(items.item.get(items.item.indexOf(laserGeschossItem)));
-                    doLaser((LaserGeschoss) geschossArrayList.get(geschossCounter));
-                    geschossCounter++;
-
-                } else if (cases == 4 && geschossArrayList.get(geschossCounter) instanceof LahmesGeschoss) {
-                    items.item.remove(items.item.get(items.item.indexOf(lahmesGeschossItem)));
-                    doLahmes(geschossArrayList.get(geschossCounter));
-                    geschossCounter++;
-
-                } else if (cases == 5 && geschossArrayList.get(geschossCounter) instanceof PortalGeschoss) {
-                    items.item.remove(items.item.get(items.item.indexOf(portalGeschossItem)));
-                    doPortal(geschossArrayList.get(geschossCounter));
-                    geschossCounter++;
-                }
-            }
-        }
+        doKeyActions(key, true);
         repaint();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int key = e.getKeyCode();
+        doKeyActions(key, false);
+        switch(key) {
+            case KeyEvent.VK_LEFT:
+                if(cases>1) {
+                    cases--;
+                    casers();
+                } else {
+                    cases = 5;
+                    casers();
+                }
+                break;
+            case KeyEvent.VK_RIGHT:
+                if(cases<5) {
+                    cases++;
+                    casers();
+                } else {
+                    cases = 1;
+                    casers();
+                }
+                break;
+        }
+    }
+
+    public void doKeyActions(int code, boolean isDown) {
+
+        switch (code) {
+            case KeyEvent.VK_W:
+                downKeys[0] = isDown;
+                break;
+            case KeyEvent.VK_S:
+                downKeys[1] = isDown;
+                break;
+
+            case KeyEvent.VK_SPACE:
+                downKeys[2] = isDown;
+                break;
+        }
+
     }
 
     void doStandard(Geschoss sg) {
@@ -371,10 +466,84 @@ public class Spielfeld extends JPanel implements KeyListener {
         sg.x = s.width;
         doAnything(sg);
     }
+    Timer tre;
+    ExplosivGeschoss eGeschoss;
     void doExplosion(Geschoss sg) {
         sg.y = s.y + (s.height / 2 + 11);
         sg.x = s.width;
-        doAnything(sg);
+        count++;
+        eGeschoss = (ExplosivGeschoss) sg;
+        final boolean[] te = {true};
+        final int[] fh = {0};
+        int savenumber = count;
+        timer = new Timer(200, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fixLag();
+                for (final int[] i = {0}; i[0] < newCounter; i[0]++) {
+                    if (sg.x < gegnerArrayList.get(i[0]).x + gegnerArrayList.get(i[0]).width && sg.x + sg.width > gegnerArrayList.get(i[0]).x && sg.y < gegnerArrayList.get(i[0]).y + gegnerArrayList.get(i[0]).height && sg.y + sg.height > gegnerArrayList.get(i[0]).y) {
+                            sg.width = 75;
+                            sg.height = 75;
+                            sg.x -= 25;
+                            sg.y -= 25;
+
+                            t.get(savenumber).stop();
+                            tre = new Timer(300, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    fh[0]++;
+                                    try {
+                                        ePicture = ImageIO.read(new File("ExplosionsGeschossAnimationen/frame-" + fh[0] + ".gif"));
+
+                                    } catch (IOException kuj) {
+                                        kuj.printStackTrace();
+                                    }
+
+
+                                    if(fh[0] > 13) {
+                                        ePictureExist = false;
+                                        stopTimer(tre);
+                                    }else{
+                                        ePictureExist = true;
+                                        System.out.println("tegfg");
+                                    }
+                                    repaint();
+                                }
+                            });
+                            tre.start();
+                            repaint();
+                            if(!ePictureExist) {
+                                t.get(savenumber).start();
+                                System.out.println("testet");
+                            }
+                        gegnerArrayList.get(i[0]).leben = gegnerArrayList.get(i[0]).leben - sg.dmg;
+                        sg.dmg = 0;
+                        if(geschossArrayList.contains(sg)) {
+                            geschossArrayList.remove(sg);
+                            geschossCounter--;
+                            if (gegnerArrayList.get(i[0]).leben <= 0) {
+                                checkGegner(i[0]);
+                                gegnerArrayList.remove(gegnerArrayList.get(i[0]));
+                                newCounter--;
+                            }
+                        }
+                        stopTimer(t.get(savenumber));
+                    }
+                }
+                if(sg.x >= Spielfeld.super.getWidth()) {
+                    if(geschossArrayList.contains(sg)) {
+                        geschossArrayList.remove(sg);
+                        geschossCounter--;
+                    }
+                    stopTimer(t.get(savenumber));
+                }
+                sg.x += 10;
+                repaint();
+
+            }
+        });
+        t.add(timer);
+        t.get(count).start();
     }
     void doLahmes(Geschoss sg) {
         sg.y = s.y + (s.height / 2);
@@ -428,16 +597,9 @@ public class Spielfeld extends JPanel implements KeyListener {
         repaint();
     }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
-
     Timer timer;
 
     public void doAnything(Geschoss sg) {
-
-
         count++;
         int savenumber = count;
         timer = new Timer(125, new ActionListener() {
@@ -534,6 +696,16 @@ public class Spielfeld extends JPanel implements KeyListener {
     public void stopTimer(Timer timer) {
         timer.stop();
         timerStopped = false;
+    }
+    int savehealth;
+    public void newHealthBar(int health, int fullHealth, int x, int y, int width) {
+        healthBar.add(new HealthBar(health, fullHealth, x, y, width));
+
+        healthBarCounter++;
+    }
+    public void remHealthBar() {
+        healthBar.remove(savehealth);
+        healthBarCounter--;
     }
 
 }

@@ -15,7 +15,8 @@ public class MinionGegner extends Gegner{
         height = 20;
         color = Color.black;
         punkte = 50;
-
+        vollesLeben = leben;
+        healthBar = new HealthBar(leben,vollesLeben,x,y,width);
 
 
     }

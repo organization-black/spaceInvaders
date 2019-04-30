@@ -6,6 +6,7 @@ abstract class Gegner extends Graphics {
 
     int bewegung;
     int leben;
+    int vollesLeben;
     int schaden;
     int x;
     int y;
@@ -14,13 +15,17 @@ abstract class Gegner extends Graphics {
     int projektilgeschw;
     Color color;
     int punkte;
+    HealthBar healthBar;
 
     public Gegner() {
-
     }
 
     public void paintComponent(Graphics g) {
-       
+        healthBar.x = x;
+        healthBar.y = y;
+        healthBar.width = width;
+        healthBar.health = leben;
+        healthBar.paintComponent(g);
     }
     public int getLeben() {
         return leben;

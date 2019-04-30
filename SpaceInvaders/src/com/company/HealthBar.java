@@ -1,26 +1,35 @@
 package com.company;
+
 import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.text.AttributedCharacterIterator;
-import java.util.Random;
 
-public class BossGegner extends Gegner{
-    public BossGegner() {
-        Random rnd = new Random();
-        schaden = 30;
-        leben = rnd.nextInt(300)+1000;
-        bewegung = rnd.nextInt(10)+100;
-        width = 150;
-        height = 150;
-        color = Color.red;
-        punkte = 1000;
-        vollesLeben = leben;
-        healthBar = new HealthBar(leben,vollesLeben,x,y,width);
+public class HealthBar extends Graphics {
+
+    public int health, fullHealth, x, y, width;
+
+    public HealthBar(int health, int fullHealth, int x, int y, int width) {
+
+        this.health = health;
+        this.fullHealth = fullHealth;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+
     }
+
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(color);
-        g.fillOval(x, y, width, height);
+
+        double procent = ((double) health / (double) fullHealth) * 100;
+
+        double newWidth = width * (procent/100);
+        //System.out.println(newWidth);
+
+        g.setColor(Color.red);
+        g.fillRect(x,y-10,width, 10);
+        g.setColor(Color.green);
+        g.fillRect(x,y-10, (int) newWidth, 10);
+
     }
 
     @Override

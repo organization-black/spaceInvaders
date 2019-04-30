@@ -17,6 +17,8 @@ public class SpiegelGegner extends Gegner {
         height = 200;
         color = Color.magenta;
         punkte = 10;
+        vollesLeben = leben;
+        healthBar = new HealthBar(leben,vollesLeben,x,y,width);
 
         }
 
