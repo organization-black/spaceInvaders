@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static java.lang.Thread.sleep;
-
 public class Spielfeld extends JPanel implements KeyListener {
 
     Spieler s;
@@ -68,6 +66,7 @@ public class Spielfeld extends JPanel implements KeyListener {
         healthBarCounter = 0;
         savehealth = 0;
         ePictureExist = false;
+        tre = new ArrayList<>();
     }
 
     private Thread runner = new Thread() {
@@ -279,7 +278,7 @@ public class Spielfeld extends JPanel implements KeyListener {
     public void checkGegner(int i) {
         System.out.println(gegnerArrayList.get(i).getClass().toString());
         if(gegnerArrayList.get(i) instanceof MinionGegner) {
-            for(int j = 0; j < 5; j++) {
+            for(int j = 0; j < 8; j++) {
                 items.item.add(standardGeschossItem);
             }
             for (int j=0; j<rnd1.nextInt(10)+1; j++) {
@@ -299,7 +298,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     items.item.add(lahmesGeschossItem);
                }
            }
-            for(int j = 0; j < 10; j++) {
+            for(int j = 0; j < 16; j++) {
                 items.item.add(standardGeschossItem);
             }
             for(int j = 0; j<3; j++) {
@@ -423,7 +422,7 @@ public class Spielfeld extends JPanel implements KeyListener {
         int key = e.getKeyCode();
         doKeyActions(key, false);
         switch(key) {
-            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 if(cases>1) {
                     cases--;
                     casers();
@@ -432,7 +431,7 @@ public class Spielfeld extends JPanel implements KeyListener {
                     casers();
                 }
                 break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 if(cases<5) {
                     cases++;
                     casers();
@@ -453,7 +452,6 @@ public class Spielfeld extends JPanel implements KeyListener {
             case KeyEvent.VK_S:
                 downKeys[1] = isDown;
                 break;
-
             case KeyEvent.VK_SPACE:
                 downKeys[2] = isDown;
                 break;
@@ -466,14 +464,15 @@ public class Spielfeld extends JPanel implements KeyListener {
         sg.x = s.width;
         doAnything(sg);
     }
-    Timer tre;
+    ArrayList<Timer> tre;
     ExplosivGeschoss eGeschoss;
+    int ecount;
     void doExplosion(Geschoss sg) {
+        ecount = 0;
         sg.y = s.y + (s.height / 2 + 11);
         sg.x = s.width;
         count++;
         eGeschoss = (ExplosivGeschoss) sg;
-        final boolean[] te = {true};
         final int[] fh = {0};
         int savenumber = count;
         timer = new Timer(200, new ActionListener() {
@@ -482,40 +481,30 @@ public class Spielfeld extends JPanel implements KeyListener {
                 fixLag();
                 for (final int[] i = {0}; i[0] < newCounter; i[0]++) {
                     if (sg.x < gegnerArrayList.get(i[0]).x + gegnerArrayList.get(i[0]).width && sg.x + sg.width > gegnerArrayList.get(i[0]).x && sg.y < gegnerArrayList.get(i[0]).y + gegnerArrayList.get(i[0]).height && sg.y + sg.height > gegnerArrayList.get(i[0]).y) {
-                            sg.width = 75;
+                            /*sg.width = 75;
                             sg.height = 75;
                             sg.x -= 25;
                             sg.y -= 25;
-
                             t.get(savenumber).stop();
-                            tre = new Timer(300, new ActionListener() {
+                            int rt = ecount;
+                            tre.add(new Timer(300, new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     fh[0]++;
                                     try {
                                         ePicture = ImageIO.read(new File("ExplosionsGeschossAnimationen/frame-" + fh[0] + ".gif"));
-
                                     } catch (IOException kuj) {
                                         kuj.printStackTrace();
-                                    }
-
-
-                                    if(fh[0] > 13) {
+                                        tre.get(rt).stop();
                                         ePictureExist = false;
-                                        stopTimer(tre);
-                                    }else{
-                                        ePictureExist = true;
-                                        System.out.println("tegfg");
                                     }
                                     repaint();
                                 }
-                            });
-                            tre.start();
+                            }));
+                            tre.get(ecount).start();
+                            ecount++;
                             repaint();
-                            if(!ePictureExist) {
-                                t.get(savenumber).start();
-                                System.out.println("testet");
-                            }
+                            t.get(savenumber).start();*/
                         gegnerArrayList.get(i[0]).leben = gegnerArrayList.get(i[0]).leben - sg.dmg;
                         sg.dmg = 0;
                         if(geschossArrayList.contains(sg)) {

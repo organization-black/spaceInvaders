@@ -9,7 +9,7 @@ import java.util.Random;
 public class MittelGegner extends Gegner {
 
     public MittelGegner(){
-        leben = 100;
+        leben = 150;
         schaden = 20;
         bewegung = 20;
         width = 25;

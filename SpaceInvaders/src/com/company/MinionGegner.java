@@ -8,7 +8,7 @@ public class MinionGegner extends Gegner{
 
 
     public MinionGegner(){
-        leben = 100;
+        leben = 75;
         schaden = 10;
         bewegung = 15;
         width = 20;
